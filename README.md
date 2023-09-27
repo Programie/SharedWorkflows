@@ -1,4 +1,4 @@
-# Shared Workflows
+# Workflows
 
 This repository contains some reusable workflows which I'm using in various GitHub Actions in my repositories.
 
