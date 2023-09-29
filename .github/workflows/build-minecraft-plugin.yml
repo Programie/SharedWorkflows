@@ -2,19 +2,19 @@ on:
   workflow_call:
     inputs:
       curseforge_id:
-        required: true
-        type: number
+        required: false
+        type: string
       modrinth_id:
-        required: true
+        required: false
         type: string
       game_versions:
-        required: true
+        required: false
         type: string
     secrets:
       CURSEFORGE_API_KEY:
-        required: true
+        required: false
       MODRINTH_API_KEY:
-        required: true
+        required: false
 
 permissions:
   contents: write
@@ -55,20 +55,40 @@ jobs:
       - id: get-version
         run: echo "version=${GITHUB_REF#refs/*/}" >> "$GITHUB_OUTPUT"
       - uses: funnyboy-roks/modrinth-auto-desc@v1.5
+        if: ${{ inputs.modrinth_id }}
         with:
           auth-token: ${{ secrets.MODRINTH_API_KEY }}
           slug: ${{ inputs.modrinth_id }}
       - uses: Kir-Antipov/mc-publish@v3.3
+        name: Publish to GitHub release
         with:
-          modrinth-id: ${{ inputs.modrinth_id }}
-          modrinth-token: ${{ secrets.MODRINTH_API_KEY }}
-          curseforge-id: ${{ inputs.curseforge_id }}
-          curseforge-token: ${{ secrets.CURSEFORGE_API_KEY }}
-          curseforge-name: ${{ steps.get-artifact-data.outputs.name }}-${{ steps.get-version.outputs.version }}.jar
           github-token: ${{ secrets.GITHUB_TOKEN }}
           version: ${{ steps.get-version.outputs.version }}
           files: "target/${{ steps.get-artifact-data.outputs.name }}.jar"
-          fail-mode: skip
+          changelog: ${{ steps.extract-release-notes.outputs.release_notes }}
+      - uses: Kir-Antipov/mc-publish@v3.3
+        name: Publish to Modrinth
+        if: ${{ inputs.modrinth_id }}
+        with:
+          modrinth-id: ${{ inputs.modrinth_id }}
+          modrinth-token: ${{ secrets.MODRINTH_API_KEY }}
+          version: ${{ steps.get-version.outputs.version }}
+          files: "target/${{ steps.get-artifact-data.outputs.name }}.jar"
+          changelog: ${{ steps.extract-release-notes.outputs.release_notes }}
+          game-versions: ${{ inputs.game_versions }}
+          loaders: |
+            bukkit
+            paper
+            spigot
+      - uses: Kir-Antipov/mc-publish@v3.3
+        name: Publish to CurseForge
+        if: ${{ inputs.curseforge_id }}
+        with:
+          curseforge-id: ${{ inputs.curseforge_id }}
+          curseforge-token: ${{ secrets.CURSEFORGE_API_KEY }}
+          curseforge-name: ${{ steps.get-artifact-data.outputs.name }}-${{ steps.get-version.outputs.version }}.jar
+          version: ${{ steps.get-version.outputs.version }}
+          files: "target/${{ steps.get-artifact-data.outputs.name }}.jar"
           changelog: ${{ steps.extract-release-notes.outputs.release_notes }}
           game-versions: ${{ inputs.game_versions }}
           loaders: |
