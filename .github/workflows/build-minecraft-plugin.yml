@@ -68,6 +68,7 @@ jobs:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           version: ${{ steps.get-version.outputs.version }}
           files: "target/${{ steps.get-artifact-data.outputs.name }}.jar"
+          fail-mode: skip
           changelog: ${{ steps.extract-release-notes.outputs.release_notes }}
           game-versions: ${{ inputs.game_versions }}
           loaders: |
