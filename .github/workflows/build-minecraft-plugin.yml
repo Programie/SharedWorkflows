@@ -29,6 +29,7 @@ jobs:
           java-version: '17'
           distribution: 'temurin'
           cache: maven
+          server-id: common-repo
       - run: mvn clean package
       - run: mvn help:evaluate -Dexpression=project.name -q -DforceStdout > artifact-name
       - uses: actions/upload-artifact@v3
