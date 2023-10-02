@@ -1,0 +1,39 @@
+on:
+  workflow_call:
+    inputs:
+      image:
+        type: string
+        required: true
+      path:
+        type: string
+        required: true
+      zip_name:
+        type: string
+        required: true
+
+permissions:
+  contents: write
+
+jobs:
+  package:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          path: checkout
+      - uses: shrink/actions-docker-extract@a0eaa32fe671598e765702e505fc8446d9984b4e
+        with:
+          image: ${{ inputs.image }}
+          path: ${{ inputs.path }}/.
+          destination: app
+      - run: cd checkout && cp CHANGELOG.md LICENSE README.md ../app
+      - run: cd app && zip -r ../${{ inputs.zip_name }}-${{ github.ref_name }}.zip .
+      - id: extract-release-notes
+        uses: ffurrer2/extract-release-notes@v1
+        with:
+          changelog_file: checkout/CHANGELOG.md
+      - uses: softprops/action-gh-release@v1
+        if: startsWith(github.ref, 'refs/tags/')
+        with:
+          body: ${{ steps.extract-release-notes.outputs.release_notes }}
+          files: ${{ inputs.zip_name }}-${{ github.ref_name }}.zip
