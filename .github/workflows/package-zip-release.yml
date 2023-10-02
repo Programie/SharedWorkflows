@@ -18,9 +18,11 @@ jobs:
       - uses: actions/checkout@v4
         with:
           path: checkout
-      - run: cd checkout && zip -r ../${{ inputs.artifact_name }} ${{ inputs.files }} CHANGELOG.md LICENSE README.md && cd ..
+      - run: cd checkout && zip -r ../${{ inputs.artifact_name }} ${{ inputs.files }} CHANGELOG.md LICENSE README.md
       - id: extract-release-notes
         uses: ffurrer2/extract-release-notes@v1
+        with:
+          changelog_file: checkout/CHANGELOG.md
       - uses: softprops/action-gh-release@v1
         if: startsWith(github.ref, 'refs/tags/')
         with:
