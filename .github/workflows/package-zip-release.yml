@@ -1,0 +1,28 @@
+on:
+  workflow_call:
+    inputs:
+      files:
+        type: string
+        required: true
+      artifact_name:
+        type: string
+        required: true
+
+permissions:
+  contents: write
+
+jobs:
+  package:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          path: checkout
+      - run: cd checkout && zip -r ../${{ inputs.artifact_name }} ${{ inputs.files }} CHANGELOG.md LICENSE README.md
+      - id: extract-release-notes
+        uses: ffurrer2/extract-release-notes@v1
+      - uses: softprops/action-gh-release@v1
+        if: startsWith(github.ref, 'refs/tags/')
+        with:
+          body: ${{ steps.extract-release-notes.outputs.release_notes }}
+          files: ${{ inputs.artifact_name }}
