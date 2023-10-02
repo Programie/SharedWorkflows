@@ -4,6 +4,9 @@ on:
       image:
         type: string
         required: true
+      version:
+        type: string
+        default: ${{ github.ref_name }}
       path:
         type: string
         required: true
@@ -23,7 +26,7 @@ jobs:
           path: checkout
       - uses: shrink/actions-docker-extract@a0eaa32fe671598e765702e505fc8446d9984b4e
         with:
-          image: ${{ inputs.image }}
+          image: ${{ inputs.image }}:${{ inputs.version }}
           path: ${{ inputs.path }}/.
           destination: app
       - run: cd checkout && cp CHANGELOG.md LICENSE README.md ../app
