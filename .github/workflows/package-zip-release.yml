@@ -1,14 +1,6 @@
 on:
   workflow_call:
     inputs:
-      checkout:
-        type: boolean
-        required: false
-        default: true
-      path:
-        type: string
-        required: false
-        default: checkout
       files:
         type: string
         required: true
@@ -24,10 +16,9 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-        if: ${{ inputs.checkout }}
         with:
-          path: ${{ inputs.path }}
-      - run: cd ${{ inputs.path }} && zip -r ../${{ inputs.artifact_name }} ${{ inputs.files }} CHANGELOG.md LICENSE README.md
+          path: checkout
+      - run: cd checkout && zip -r ../${{ inputs.artifact_name }} ${{ inputs.files }} CHANGELOG.md LICENSE README.md
       - id: extract-release-notes
         uses: ffurrer2/extract-release-notes@v1
       - uses: softprops/action-gh-release@v1
