@@ -15,15 +15,14 @@ on:
         required: false
         type: boolean
         default: false
-      cache:
-        required: false
-        type: boolean
-        default: ${{ !startsWith(github.ref, 'refs/tags/') && !inputs.use_latest_release }}
     secrets:
       DOCKER_USERNAME:
         required: true
       DOCKER_PASSWORD:
         required: true
+
+env:
+  USE_CACHE: ${{ !startsWith(github.ref, 'refs/tags/') && !inputs.use_latest_release }}
 
 jobs:
   build:
@@ -54,8 +53,8 @@ jobs:
         with:
           push: true
           context: ${{ inputs.context }}
-          cache-from: ${{ inputs.cache && 'type=gha' || '' }}
-          cache-to: ${{ inputs.cache && 'type=gha,mode=max' || '' }}
+          cache-from: ${{ env.USE_CACHE && 'type=gha' || '' }}
+          cache-to: ${{ env.USE_CACHE && 'type=gha,mode=max' || '' }}
           tags: ${{ steps.metadata.outputs.tags }}
           labels: ${{ steps.metadata.outputs.labels }}
       - uses: peter-evans/dockerhub-description@dc67fad7001ef9e8e3c124cb7a64e16d0a63d864
