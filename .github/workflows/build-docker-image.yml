@@ -53,8 +53,8 @@ jobs:
         with:
           push: true
           context: ${{ inputs.context }}
-          cache-from: ${{ env.USE_CACHE && 'type=gha' || '' }}
-          cache-to: ${{ env.USE_CACHE && 'type=gha,mode=max' || '' }}
+          cache-from: ${{ env.USE_CACHE == 'true' && 'type=gha' || '' }}
+          cache-to: ${{ env.USE_CACHE == 'true' && 'type=gha,mode=max' || '' }}
           tags: ${{ steps.metadata.outputs.tags }}
           labels: ${{ steps.metadata.outputs.labels }}
       - uses: peter-evans/dockerhub-description@dc67fad7001ef9e8e3c124cb7a64e16d0a63d864
