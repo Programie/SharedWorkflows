@@ -31,6 +31,5 @@ jobs:
         with:
           body: ${{ steps.extract-release-notes.outputs.release_notes }}
           files: ${{ inputs.artifact_name }}
-      - if: ${{ secrets.WEBSITE_UPDATE_TOKEN }}
-        run: |
+      - run: |
           curl -X POST -d repository=${{ github.repository }} -H "X-Update-Token: ${{ secrets.WEBSITE_UPDATE_TOKEN }}" https://selfcoders.com/update-project
