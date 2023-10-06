@@ -24,7 +24,7 @@ on:
 
 permissions:
   contents: write
-  packages: ${{ inputs.deploy_package && "write" || "read" }}
+  packages: write
 
 jobs:
   build:
