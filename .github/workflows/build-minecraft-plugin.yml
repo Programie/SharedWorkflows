@@ -10,6 +10,10 @@ on:
       game_versions:
         required: false
         type: string
+      deploy_package:
+        required: false
+        type: boolean
+        default: false
     secrets:
       CURSEFORGE_API_KEY:
         required: false
@@ -20,6 +24,7 @@ on:
 
 permissions:
   contents: write
+  packages: ${{ inputs.deploy_package && "write" || "read" }}
 
 jobs:
   build:
@@ -32,6 +37,10 @@ jobs:
           distribution: 'temurin'
           cache: maven
       - run: mvn clean package
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - run: mvn deploy
+        if: ${{ inputs.deploy_package }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - run: mvn help:evaluate -Dexpression=project.name -q -DforceStdout > artifact-name
