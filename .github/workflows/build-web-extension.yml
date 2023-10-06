@@ -37,4 +37,4 @@ jobs:
           files: web-ext-artifacts/*.zip
           fail_on_unmatched_files: true
       - run: |
-          curl -X POST -d repository=${{ github.repository }} -H "X-Update-Token: ${{ secrets.WEBSITE_UPDATE_TOKEN }}" https://selfcoders.com/update-project
+          curl --fail -X POST -d repository=${{ github.repository }} -H "X-Update-Token: ${{ secrets.WEBSITE_UPDATE_TOKEN }}" https://selfcoders.com/update-project
