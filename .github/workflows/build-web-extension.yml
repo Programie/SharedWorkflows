@@ -20,7 +20,7 @@ jobs:
       - uses: actions/upload-artifact@v3
         with:
           path: |
-            web-ext-artifacts/*.zip
+            web-ext-artifacts/*.xpi
             CHANGELOG.md
 
   release:
@@ -34,7 +34,7 @@ jobs:
       - uses: softprops/action-gh-release@v1
         with:
           body: ${{ steps.extract-release-notes.outputs.release_notes }}
-          files: web-ext-artifacts/*.zip
+          files: web-ext-artifacts/*.xpi
           fail_on_unmatched_files: true
       - run: |
           curl --fail -X POST -d repository=${{ github.repository }} -H "X-Update-Token: ${{ secrets.WEBSITE_UPDATE_TOKEN }}" https://selfcoders.com/update-project
