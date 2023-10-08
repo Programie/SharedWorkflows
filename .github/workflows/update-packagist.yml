@@ -5,8 +5,11 @@ jobs:
   update:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: mnavarrocarter/packagist-update@d690a9bd3ae4307d591bae8251838f994c14b2cc
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Update project on Packagist
+        uses: mnavarrocarter/packagist-update@d690a9bd3ae4307d591bae8251838f994c14b2cc
         with:
           username: ${{ secrets.PACKAGIST_USERNAME }}
           api_token: ${{ secrets.PACKAGIST_TOKEN }}

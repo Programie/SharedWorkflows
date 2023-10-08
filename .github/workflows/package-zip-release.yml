@@ -18,18 +18,27 @@ jobs:
   package:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout
+        uses: actions/checkout@v4
         with:
           path: checkout
-      - run: cd checkout && zip -r ../${{ inputs.artifact_name }} ${{ inputs.files }} CHANGELOG.md LICENSE README.md
-      - id: extract-release-notes
+
+      - name: Create zip file ${{ inputs.artifact_name }}
+        run: cd checkout && zip -r ../${{ inputs.artifact_name }} ${{ inputs.files }} CHANGELOG.md LICENSE README.md
+
+      - name: Extract release notes
+        id: extract-release-notes
         uses: ffurrer2/extract-release-notes@v1
         with:
           changelog_file: checkout/CHANGELOG.md
-      - uses: softprops/action-gh-release@v1
+
+      - name: Create release
+        uses: softprops/action-gh-release@v1
         if: startsWith(github.ref, 'refs/tags/')
         with:
           body: ${{ steps.extract-release-notes.outputs.release_notes }}
           files: ${{ inputs.artifact_name }}
-      - run: |
+
+      - name: Update project on website
+        run: |
           curl --fail -X POST -d repository=${{ github.repository }} -H "X-Update-Token: ${{ secrets.WEBSITE_UPDATE_TOKEN }}" https://selfcoders.com/update-project
