@@ -13,6 +13,9 @@ on:
       zip_name:
         type: string
         required: true
+      files:
+        type: string
+        required: false
     secrets:
       WEBSITE_UPDATE_TOKEN:
         required: false
@@ -33,6 +36,8 @@ jobs:
           path: ${{ inputs.path }}/.
           destination: app
       - run: cd checkout && cp CHANGELOG.md LICENSE README.md ../app
+      - if: ${{ inputs.files }}
+        run: cd checkout && cp -r ${{ inputs.files }} ../app
       - run: cd app && zip -r ../${{ inputs.zip_name }}-${{ github.ref_name }}.zip .
       - id: extract-release-notes
         uses: ffurrer2/extract-release-notes@v1
