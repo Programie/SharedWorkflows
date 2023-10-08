@@ -16,7 +16,7 @@ on:
       MODRINTH_API_KEY:
         required: false
       WEBSITE_UPDATE_TOKEN:
-        required: false
+        required: true
 
 permissions:
   contents: write

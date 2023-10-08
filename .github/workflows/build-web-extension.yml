@@ -2,7 +2,7 @@ on:
   workflow_call:
     secrets:
       WEBSITE_UPDATE_TOKEN:
-        required: false
+        required: true
 
 permissions:
   contents: write
