@@ -1,0 +1,39 @@
+on:
+  workflow_call:
+    inputs:
+      php_versions:
+        type: string
+        required: true
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        php-versions: ${{ fromJSON(inputs.php_versions) }}
+
+    name: PHP ${{ matrix.php-versions }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Install PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ matrix.php-versions }}
+          tools: composer
+          coverage: xdebug
+
+      - id: composer-cache
+        run: echo "dir=$(composer config cache-files-dir)" >> $GITHUB_OUTPUT
+
+      - uses: actions/cache@v3
+        with:
+          path: ${{ steps.composer-cache.outputs.dir }}
+          key: ${{ runner.os }}-composer-${{ matrix.php-versions }}-${{ hashFiles('**/composer.lock') }}
+          restore-keys: ${{ runner.os }}-composer-${{ matrix.php-versions }}-
+
+      - run: composer install --no-interaction --prefer-dist
+      - run: XDEBUG_MODE=coverage ./vendor/bin/phpunit --coverage-text
