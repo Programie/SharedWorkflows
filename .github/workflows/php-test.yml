@@ -27,7 +27,8 @@ jobs:
           tools: composer
           coverage: xdebug
 
-      - id: composer-cache
+      - name: Get Composer cache path
+        id: composer-cache
         run: echo "dir=$(composer config cache-files-dir)" >> $GITHUB_OUTPUT
 
       - uses: actions/cache@v3
@@ -36,5 +37,8 @@ jobs:
           key: ${{ runner.os }}-composer-${{ matrix.php-versions }}-${{ hashFiles('**/composer.lock') }}
           restore-keys: ${{ runner.os }}-composer-${{ matrix.php-versions }}-
 
-      - run: composer install --no-interaction --prefer-dist
-      - run: XDEBUG_MODE=coverage ./vendor/bin/phpunit --coverage-text
+      - name: Install dependencies
+        run: composer install --no-interaction --prefer-dist
+
+      - name: Execute PHPUnit
+        run: XDEBUG_MODE=coverage ./vendor/bin/phpunit --coverage-text
