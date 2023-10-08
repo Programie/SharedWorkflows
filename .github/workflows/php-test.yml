@@ -4,6 +4,9 @@ on:
       php_versions:
         type: string
         required: true
+    secrets:
+      CODECOV_TOKEN:
+        required: true
 
 jobs:
   test:
@@ -31,15 +34,20 @@ jobs:
         id: composer-cache
         run: echo "dir=$(composer config cache-files-dir)" >> $GITHUB_OUTPUT
 
-      - name: Configure cache
+      - name: Configure cache for Composer
         uses: actions/cache@v3
         with:
           path: ${{ steps.composer-cache.outputs.dir }}
           key: ${{ runner.os }}-composer-${{ matrix.php-versions }}-${{ hashFiles('**/composer.lock') }}
           restore-keys: ${{ runner.os }}-composer-${{ matrix.php-versions }}-
 
-      - name: Install dependencies
+      - name: Install dependencies with Composer
         run: composer install --no-interaction --prefer-dist
 
-      - name: Execute PHPUnit
-        run: XDEBUG_MODE=coverage ./vendor/bin/phpunit --coverage-text
+      - name: Run tests with PHPUnit
+        run: vendor/bin/phpunit --coverage-clover=coverage.xml
+
+      - name: Send code coverage report to Codecov.io
+        uses: codecov/codecov-action@v3
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
