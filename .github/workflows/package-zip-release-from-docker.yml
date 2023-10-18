@@ -1,9 +1,6 @@
 on:
   workflow_call:
     inputs:
-      image:
-        type: string
-        required: true
       version:
         type: string
         default: ${{ github.ref_name }}
@@ -27,15 +24,19 @@ jobs:
   package:
     runs-on: ubuntu-latest
     steps:
+      - name: Downcase repo name
+        run: |
+          echo "GHCR_IMAGE=ghcr.io/${GITHUB_REPOSITORY,,}:${{ inputs.version }}" >> ${GITHUB_ENV}
+
       - name: Checkout
         uses: actions/checkout@v4
         with:
           path: checkout
 
-      - name: Extract files from Docker image ${{ inputs.image }}:${{ inputs.version }}
+      - name: Extract files from Docker image ${{ env.GHCR_IMAGE }}
         uses: shrink/actions-docker-extract@a0eaa32fe671598e765702e505fc8446d9984b4e
         with:
-          image: ${{ inputs.image }}:${{ inputs.version }}
+          image: ${{ env.GHCR_IMAGE }}
           path: ${{ inputs.path }}/.
           destination: app
 
