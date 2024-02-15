@@ -53,7 +53,7 @@ jobs:
             README.md
             artifact-name
 
-  release:
+  release-github:
     runs-on: ubuntu-latest
     if: startsWith(github.ref, 'refs/tags/')
     needs: build
@@ -83,6 +83,32 @@ jobs:
           files: "target/${{ steps.get-artifact-data.outputs.name }}.jar"
           changelog: ${{ steps.extract-release-notes.outputs.release_notes }}
 
+      - name: Update project on website
+        run: |
+          curl --fail -X POST -d repository=${{ github.repository }} -H "X-Update-Token: ${{ secrets.WEBSITE_UPDATE_TOKEN }}" https://selfcoders.com/update-project
+
+  release-modrinth:
+    runs-on: ubuntu-latest
+    if: startsWith(github.ref, 'refs/tags/')
+    needs: build
+    steps:
+      - name: Download artifact
+        uses: actions/download-artifact@v3
+        with:
+          name: package
+
+      - name: Extract release notes
+        id: extract-release-notes
+        uses: ffurrer2/extract-release-notes@v1
+
+      - name: Get artifact name
+        id: get-artifact-data
+        run: echo "name=$(cat artifact-name)" >> "$GITHUB_OUTPUT"
+
+      - name: Get version
+        id: get-version
+        run: echo "version=${GITHUB_REF#refs/*/}" >> "$GITHUB_OUTPUT"
+
       - name: Publish to Modrinth
         uses: Kir-Antipov/mc-publish@v3.3
         if: ${{ inputs.modrinth_id }}
@@ -105,6 +131,28 @@ jobs:
           auth-token: ${{ secrets.MODRINTH_API_KEY }}
           slug: ${{ inputs.modrinth_id }}
 
+  release-curseforge:
+    runs-on: ubuntu-latest
+    if: startsWith(github.ref, 'refs/tags/')
+    needs: build
+    steps:
+      - name: Download artifact
+        uses: actions/download-artifact@v3
+        with:
+          name: package
+
+      - name: Extract release notes
+        id: extract-release-notes
+        uses: ffurrer2/extract-release-notes@v1
+
+      - name: Get artifact name
+        id: get-artifact-data
+        run: echo "name=$(cat artifact-name)" >> "$GITHUB_OUTPUT"
+
+      - name: Get version
+        id: get-version
+        run: echo "version=${GITHUB_REF#refs/*/}" >> "$GITHUB_OUTPUT"
+
       - name: Publish to CurseForge
         uses: Kir-Antipov/mc-publish@v3.3
         if: ${{ inputs.curseforge_id }}
@@ -120,7 +168,3 @@ jobs:
             bukkit
             paper
             spigot
-
-      - name: Update project on website
-        run: |
-          curl --fail -X POST -d repository=${{ github.repository }} -H "X-Update-Token: ${{ secrets.WEBSITE_UPDATE_TOKEN }}" https://selfcoders.com/update-project
