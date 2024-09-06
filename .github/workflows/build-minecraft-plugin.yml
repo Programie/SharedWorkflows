@@ -29,7 +29,7 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Setup Java
-        uses: actions/setup-java@v3
+        uses: actions/setup-java@v4
         with:
           java-version: '17'
           distribution: 'temurin'
@@ -44,7 +44,7 @@ jobs:
         run: mvn help:evaluate -Dexpression=project.name -q -DforceStdout > artifact-name
 
       - name: Upload artifact
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: package
           path: |
@@ -59,13 +59,13 @@ jobs:
     needs: build
     steps:
       - name: Download artifact
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
           name: package
 
       - name: Extract release notes
         id: extract-release-notes
-        uses: ffurrer2/extract-release-notes@v1
+        uses: ffurrer2/extract-release-notes@v2
 
       - name: Get artifact name
         id: get-artifact-data
@@ -93,13 +93,13 @@ jobs:
     needs: build
     steps:
       - name: Download artifact
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
           name: package
 
       - name: Extract release notes
         id: extract-release-notes
-        uses: ffurrer2/extract-release-notes@v1
+        uses: ffurrer2/extract-release-notes@v2
 
       - name: Get artifact name
         id: get-artifact-data
@@ -137,13 +137,13 @@ jobs:
     needs: build
     steps:
       - name: Download artifact
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
           name: package
 
       - name: Extract release notes
         id: extract-release-notes
-        uses: ffurrer2/extract-release-notes@v1
+        uses: ffurrer2/extract-release-notes@v2
 
       - name: Get artifact name
         id: get-artifact-data

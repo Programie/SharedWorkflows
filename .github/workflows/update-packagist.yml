@@ -9,7 +9,7 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Update project on Packagist
-        uses: mnavarrocarter/packagist-update@d690a9bd3ae4307d591bae8251838f994c14b2cc
+        uses: mnavarrocarter/packagist-update@v1.0.0
         with:
           username: ${{ secrets.PACKAGIST_USERNAME }}
           api_token: ${{ secrets.PACKAGIST_TOKEN }}
